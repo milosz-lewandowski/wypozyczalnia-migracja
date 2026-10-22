@@ -55,7 +55,7 @@ public sealed class ReservationControllerTest : IDisposable
     }
 
     /* R-OK przez HTTP (wyprowadzenie w ReservationServiceTest.ROk_CreatesNewReservation). */
-    [Fact(DisplayName = "R-OK: 201, status NEW, estimatedPrice 0.00 do przeniesienia wyceny, daty yyyy-MM-ddTHH:mm")]
+    [Fact(DisplayName = "R-OK: 201, status NEW, estimatedPrice 90.00, daty yyyy-MM-ddTHH:mm")]
     public async Task Create_Ok()
     {
         var response = await PostReservation(
@@ -69,7 +69,7 @@ public sealed class ReservationControllerTest : IDisposable
         Assert.Equal("2026-10-26T08:00", body.GetProperty("from").GetString());
         Assert.Equal("2026-10-28T08:00", body.GetProperty("to").GetString());
         Assert.Equal("NEW", body.GetProperty("status").GetString());
-        Assert.Equal("0.00", body.GetProperty("estimatedPrice").GetRawText());
+        Assert.Equal("90.00", body.GetProperty("estimatedPrice").GetRawText());
         Assert.Equal("odbior rano", body.GetProperty("notes").GetString());
     }
 

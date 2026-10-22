@@ -26,6 +26,20 @@ public static class QueryParameters
         return result;
     }
 
+    /// <summary>Parametr wymagany: brak albo pusta wartosc -> "Brak parametru: X", nie liczba -> "Niepoprawna wartosc parametru: X".</summary>
+    public static long RequireLong(string? value, string name)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new InvalidRequestException($"Brak parametru: {name}");
+        }
+        if (!long.TryParse(value.Trim(), NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long result))
+        {
+            throw new InvalidRequestException($"Niepoprawna wartosc parametru: {name}");
+        }
+        return result;
+    }
+
     /// <summary>Parametr opcjonalny: brak albo pusta wartosc = null.</summary>
     public static long? OptionalLong(string? value, string name)
     {

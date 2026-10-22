@@ -9,7 +9,6 @@ namespace Wypozyczalnia.Tests.Characterization;
 /// Kolejnosc sprawdzen (legacy-app-parent/legacy-app/WypozyczalniaCore/ReservationManager.vb:19-39):
 /// daty (:20-22) -&gt; maks. 60 dni, TotalDays ulamkowe (:23-25) -&gt; klient (:27-31, CustomerManager.vb:26-37)
 /// -&gt; dostepnosc (:33-36) -&gt; cena szacunkowa = wycena (:38-39) -&gt; zapis ze statusem N (:41-51).
-/// Stan s1-start: wyceny jeszcze nie ma w new-app, cena szacunkowa = 0,00; test R-PROG wylaczony do jej przeniesienia.
 /// Zapis zmienia baze, wiec kazdy test dostaje wlasna baze w pamieci (TestApplication; w Javie: @Transactional z rollbackiem).
 /// </summary>
 public sealed class ReservationServiceTest : IDisposable
@@ -29,15 +28,14 @@ public sealed class ReservationServiceTest : IDisposable
      * 1. 2880 min -> 2 doby (PricingManager.vb:22-28); doby pn, wt -> 0 weekendowych (:38-45).
      * 2. 2 * 45,00 = 90,00; brak rabatu tygodniowego (2 \ 7 = 0) i progu (0 %).
      * 3. Status N = NEW (ReservationManager.vb:46), cena = wycena (:39).
-     * Stan s1-start: bez wyceny cena = 0,00; po przeniesieniu wyceny wraca oczekiwanie 90,00.
      */
-    [Fact(DisplayName = "R-OK: 2 doby -> NEW, cena 0,00 do przeniesienia wyceny (docelowo 90,00)")]
+    [Fact(DisplayName = "R-OK: 2 doby -> NEW, cena 90,00")]
     public void ROk_CreatesNewReservation()
     {
         Reservation reservation = reservationService.Create(1, 1, At(2026, 10, 26, 8, 0), At(2026, 10, 28, 8, 0), null);
 
         Assert.Equal(ReservationStatus.NEW, reservation.Status);
-        Assert.Equal(0.00m, reservation.EstimatedPrice);
+        Assert.Equal(90.00m, reservation.EstimatedPrice);
         Assert.Equal(1L, reservation.CustomerId);
         Assert.Equal(1L, reservation.EquipmentId);
         Assert.True(reservation.Id >= 100L);
@@ -48,8 +46,7 @@ public sealed class ReservationServiceTest : IDisposable
      * Cena = wycena (ReservationManager.vb:39), jak W-A: 5 dob pn-pt, 144,25; rabat CInt(2,5) = 2 %;
      * Math.Round(141,365, 2) = 141,36 (polowka do parzystej) (PricingManager.vb:50-54, :58-60).
      */
-    [Fact(DisplayName = "R-PROG: cena szacunkowa = wycena z rabatem klienta -> 141,36",
-        Skip = "Wymaga wyceny w new-app; wlaczyc po przeniesieniu wyceny z legacy")]
+    [Fact(DisplayName = "R-PROG: cena szacunkowa = wycena z rabatem klienta -> 141,36")]
     public void RTier_PriceIsQuote()
     {
         Reservation reservation = reservationService.Create(2, 6, At(2026, 11, 2, 8, 0), At(2026, 11, 7, 8, 0), null);
@@ -140,8 +137,7 @@ public sealed class ReservationServiceTest : IDisposable
 
     /*
      * R-404: nieznany sprzet. Procedura dostepnosci nie zwraca kolizji dla nieistniejacego Id, wiec blad pada dopiero
-     * w wycenie (ReservationManager.vb:39 -> PricingManager.vb:32-33). Stan s1-start: to samo miejsce i komunikat,
-     * sprawdza EquipmentRepository.
+     * w wycenie (ReservationManager.vb:39 -> PricingManager.vb:32-33).
      */
     [Fact(DisplayName = "R-404: nieznany sprzet -> Nieznany sprzet: 999")]
     public void RUnknownEquipment()

@@ -5,22 +5,17 @@ namespace Wypozyczalnia.Services;
 
 /// <summary>
 /// Rezerwacje przeniesione z legacy-app-parent/legacy-app/WypozyczalniaCore/ReservationManager.vb (UtworzRezerwacje :19-55).
-/// Kolejnosc sprawdzen jak w legacy: daty -> 60 dni -> klient -> dostepnosc -> cena.
-/// Stan s1-start: wycena nie jest jeszcze przeniesiona, wiec cena szacunkowa to 0,00 (kolumna estimated_price
-/// jest NOT NULL), a nieznany sprzet wykrywa EquipmentRepository zamiast wyceny.
+/// Kolejnosc sprawdzen jak w legacy: daty -> 60 dni -> klient -> dostepnosc -> cena (= wycena, PricingService).
 /// </summary>
 public class ReservationService(
     AvailabilityService availabilityService,
-    EquipmentRepository equipmentRepository,
+    PricingService pricingService,
     CustomerRepository customerRepository,
     ReservationRepository reservationRepository)
 {
     private const long MaxReservationDays = 60;
     private const long MinutesPerDay = 1440;
     private const int MaxNotesLength = 500;
-
-    /// <summary>Cena szacunkowa do czasu przeniesienia wyceny (kolumna estimated_price nie przyjmuje NULL).</summary>
-    private static readonly decimal PriceNotQuoted = 0.00m;
 
     /// <summary>Sprawdzenie dostepnosci i zapis bez przeplotu z innym zadaniem (w Javie: @Transactional).</summary>
     private readonly Lock createLock = new();
@@ -53,13 +48,9 @@ public class ReservationService(
             {
                 throw new ConflictException("Sprzet niedostepny w wybranym terminie");
             }
-            // ReservationManager.vb:38-39 - w legacy nieznany sprzet konczy sie bledem 404 dopiero w wycenie
-            if (equipmentRepository.FindById(equipmentId) is null)
-            {
-                throw new NotFoundException($"Nieznany sprzet: {equipmentId}");
-            }
-            // TODO po przeniesieniu wyceny: cena szacunkowa = wycena (ReservationManager.vb:38-39)
-            decimal estimatedPrice = PriceNotQuoted;
+            // ReservationManager.vb:38-39 - cena szacunkowa = wycena; nieznany sprzet konczy sie bledem 404 w wycenie
+            // (PricingManager.vb:32-33), brak taryfy na dzien wydania - bledem 409 (PricingDAL.vb:18-19)
+            decimal estimatedPrice = pricingService.CalculateQuote(equipmentId, from, to, customerId).Amount;
 
             // ReservationManager.vb:41-51
             long id = reservationRepository.Insert(customerId, equipmentId, from, to, estimatedPrice, TrimNotes(notes));
