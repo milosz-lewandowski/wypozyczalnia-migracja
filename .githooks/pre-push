@@ -1,0 +1,23 @@
+#!/bin/sh
+# Lokalny core.hooksPath=.githooks: przekazanie do globalnego pre-push (np. guard blokujacy push).
+
+# Przekazanie do globalnego hooka o tej samej nazwie (np. ~/.claude/git-guards/hooks/pre-push),
+# bo lokalny core.hooksPath=.githooks zastepuje globalny core.hooksPath.
+przekaz_do_globalnego() {
+    nazwa="$1"; shift
+    globalny=$(git config --global --path --get core.hooksPath 2>/dev/null)
+    [ -n "$globalny" ] || return 0
+    lokalny_katalog=$(cd "$(dirname "$0")" && pwd -P)
+    globalny_katalog=$(cd "$globalny" 2>/dev/null && pwd -P) || {
+        echo "githooks: globalny core.hooksPath '$globalny' nie istnieje - przerywam, zeby nie pominac globalnych hookow" >&2
+        exit 1
+    }
+    [ "$lokalny_katalog" != "$globalny_katalog" ] || return 0
+    hook="$globalny_katalog/$nazwa"
+    [ -f "$hook" ] || return 0
+    if [ -x "$hook" ]; then exec "$hook" "$@"; fi
+    exec sh "$hook" "$@"
+}
+
+przekaz_do_globalnego pre-push "$@"
+exit 0

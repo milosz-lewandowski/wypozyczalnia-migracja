@@ -20,3 +20,6 @@ __pycache__/
 # Playwright
 test-results/
 playwright-report/
+
+# eksporty sesji agentów (lokalne artefakty, nie commitujemy)
+legacy-app-parent/export-procsu-*

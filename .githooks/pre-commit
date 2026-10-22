@@ -1,0 +1,42 @@
+#!/bin/sh
+# migration-supervisor: blokuje commit plikow procesu P1-P7 bez aktualizacji stanu migracji.
+# Instalacja: python .agents/skills/migration-supervisor/scripts/supervisor.py zainstaluj-hooki
+# Nie omijaj przez git commit --no-verify.
+
+# Przekazanie do globalnego hooka o tej samej nazwie (np. ~/.claude/git-guards/hooks/pre-push),
+# bo lokalny core.hooksPath=.githooks zastepuje globalny core.hooksPath.
+przekaz_do_globalnego() {
+    nazwa="$1"; shift
+    globalny=$(git config --global --path --get core.hooksPath 2>/dev/null)
+    [ -n "$globalny" ] || return 0
+    lokalny_katalog=$(cd "$(dirname "$0")" && pwd -P)
+    globalny_katalog=$(cd "$globalny" 2>/dev/null && pwd -P) || {
+        echo "githooks: globalny core.hooksPath '$globalny' nie istnieje - przerywam, zeby nie pominac globalnych hookow" >&2
+        exit 1
+    }
+    [ "$lokalny_katalog" != "$globalny_katalog" ] || return 0
+    hook="$globalny_katalog/$nazwa"
+    [ -f "$hook" ] || return 0
+    if [ -x "$hook" ]; then exec "$hook" "$@"; fi
+    exec sh "$hook" "$@"
+}
+
+znajdz_pythona() {
+    for kandydat in python python3 "py -3"; do
+        if $kandydat -c "import sys; sys.exit(0 if sys.version_info[0] == 3 else 1)" >/dev/null 2>&1; then
+            echo "$kandydat"; return 0
+        fi
+    done
+    return 1
+}
+
+korzen=$(git rev-parse --show-toplevel) || exit 1
+cd "$korzen" || exit 1
+python_cmd=$(znajdz_pythona) || {
+    echo "migration-supervisor: brak Pythona 3 (python, python3, py -3) - commit zablokowany" >&2
+    exit 1
+}
+$python_cmd .agents/skills/migration-supervisor/scripts/supervisor.py hook-pre-commit || exit 1
+
+przekaz_do_globalnego pre-commit "$@"
+exit 0

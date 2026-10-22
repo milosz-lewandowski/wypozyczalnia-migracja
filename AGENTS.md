@@ -27,3 +27,15 @@ Dane w repozytorium są w 100% syntetyczne.
 
 - kodu legacy nie zmieniamy
 - dokumenty i komunikaty piszemy po polsku
+
+## Workflow migracji
+
+Kolejność dla każdego procesu P1–P7 (`legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md`):
+
+1. skill `migration-supervisor`: postęp `python .agents/skills/migration-supervisor/scripts/supervisor.py info`; zgoda `... rozpocznij P<n> --agent <nazwa>` (kod 3 = odmowa, nie migrujemy)
+2. agent `migration-implementer` (`.github/agents/`) + skill `legacy-migration-guide`: implementacja 1:1 z legacy
+3. skill `migration-commit-pr`: podzia? zmian po procesie, dokument pochodzenia `new-app-parent/new-docs/migracja/P<n>-<slug>.md`, review agentem `migration-reviewer` (CRITICAL/HIGH wracaj? do implementera, maks. 3 rundy), bramka, `zakoncz`/`odnotuj` w supervisorze, wpis w `new-app-parent/new-docs/CHANGELOG.md`, commit per proces, PR
+
+- hooki: `python .agents/skills/migration-supervisor/scripts/supervisor.py zainstaluj-hooki` (pre-commit blokuje commit procesu bez aktualizacji stanu migracji; globalne hooki działają dalej)
+- `git commit --no-verify` i `git push --no-verify` s? zabronione
+- stan migracji: `new-app-parent/new-docs/NEW-PRZEPLYWY-BIZNESOWE.md` (generowany, nie edytujemy ręcznie)

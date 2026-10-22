@@ -1,0 +1,80 @@
+{
+  "wersja": 1,
+  "opis": "Stan migracji procesów P1-P7 prowadzony przez skill migration-supervisor. Nie edytuj ręcznie: używaj komend supervisor.py.",
+  "procesy": {
+    "P1": {
+      "status": "nierozpoczety",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [],
+      "historia": []
+    },
+    "P2": {
+      "status": "czesciowy",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [
+        "anulowanie rezerwacji z legacy (`legacy-app-parent/legacy-app/WypozyczalniaWeb/Rezerwacja.aspx.vb:205`) nie jest przeniesione",
+        "cena szacunkowa rezerwacji = 0,00 do czasu przeniesienia wyceny P1 (`legacy-app-parent/legacy-app/WypozyczalniaCore/ReservationManager.vb:38-39`)"
+      ],
+      "historia": [
+        {
+          "kiedy": "2026-10-22T09:00:00+02:00",
+          "akcja": "stan-bazowy",
+          "opis": "stan bazowy m3-start: tworzenie i lista rezerwacji w new-app (POST/GET /api/reservations, RezerwacjaPage), bez anulowania",
+          "galaz": "m3-start",
+          "agent": null
+        }
+      ]
+    },
+    "P3": {
+      "status": "nierozpoczety",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [],
+      "historia": []
+    },
+    "P4": {
+      "status": "nierozpoczety",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [],
+      "historia": []
+    },
+    "P5": {
+      "status": "nierozpoczety",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [],
+      "historia": []
+    },
+    "P6": {
+      "status": "nierozpoczety",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [],
+      "historia": []
+    },
+    "P7": {
+      "status": "nierozpoczety",
+      "poprzedni_status": null,
+      "galaz": null,
+      "agent": null,
+      "dokument": null,
+      "braki": [],
+      "historia": []
+    }
+  }
+}

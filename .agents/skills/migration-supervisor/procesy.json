@@ -1,0 +1,142 @@
+{
+  "wersja": 1,
+  "opis": "Rejestr procesów biznesowych P1-P7 (legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md). Wzorce nazw przypisują zmienione pliki new-app do procesu; sygnały wykrywają obecność kodu procesu w new-app.",
+  "analiza": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md",
+  "pliki_meta": [
+    "new-app-parent/new-docs/migracja/stan-migracji.json",
+    "new-app-parent/new-docs/NEW-PRZEPLYWY-BIZNESOWE.md",
+    "new-app-parent/new-docs/CHANGELOG.md"
+  ],
+  "zakres_procesowy": [
+    "^new-app-parent/new-app/",
+    "^new-app-parent/new-docs/KONTRAKT-API\\.md$"
+  ],
+  "pomijane": [
+    "/(bin|obj|node_modules|dist|build|TestResults)/"
+  ],
+  "wspolne": [
+    "/Config/ServiceRegistration\\.cs$",
+    "/Controllers/QueryParameters\\.cs$",
+    "/Controllers/ApiExceptionHandler\\.cs$",
+    "/Wypozyczalnia\\.Api/Program\\.cs$",
+    "/Model/Money\\.cs$",
+    "/Model/Customer\\.cs$",
+    "/Repositories/CustomerRepository\\.cs$",
+    "/Model/Equipment(Status)?\\.cs$",
+    "/Repositories/EquipmentRepository\\.cs$",
+    "/Repositories/Sqlite/",
+    "/Dto/IsoDateTime\\.cs$",
+    "/Dto/ErrorResponse\\.cs$",
+    "^new-app-parent/new-docs/KONTRAKT-API\\.md$",
+    "/frontend/src/App\\.tsx$",
+    "/frontend/src/api/http\\.ts$",
+    "/frontend/src/components/"
+  ],
+  "procesy": [
+    {
+      "id": "P1",
+      "nazwa": "wycena",
+      "slug": "wycena",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p1--wycena",
+      "legacy": [
+        {"opis": "Cennik.btnOblicz_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Cennik.aspx.vb:101-129"},
+        {"opis": "szacunek Rezerwacja.btnSprawdz_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Rezerwacja.aspx.vb:40-74"},
+        {"opis": "PricingManager.ObliczOplate / LiczbaDob / RabatProgu", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/PricingManager.vb:22-60"}
+      ],
+      "wzorce_nazw": ["Pricing", "Tariff", "Tarif", "Wycen", "Quote", "Cennik"],
+      "sygnaly": ["/backend/src/Wypozyczalnia\\.Api/Controllers/PricingController\\.cs$"],
+      "strona": "new-app-parent/new-app/frontend/src/pages/WycenaPage.tsx",
+      "endpointy": ["GET /api/pricing/quote"]
+    },
+    {
+      "id": "P2",
+      "nazwa": "rezerwacja",
+      "slug": "rezerwacja",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p2--rezerwacja",
+      "legacy": [
+        {"opis": "Rezerwacja.btnZarezerwuj_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Rezerwacja.aspx.vb:77-119"},
+        {"opis": "anulowanie rezerwacji", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Rezerwacja.aspx.vb:205"},
+        {"opis": "ReservationManager.UtworzRezerwacje", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/ReservationManager.vb:18-59"}
+      ],
+      "wzorce_nazw": ["Reservation", "Rezerwac", "Availability"],
+      "sygnaly": ["/backend/src/Wypozyczalnia\\.Api/Controllers/ReservationController\\.cs$"],
+      "strona": "new-app-parent/new-app/frontend/src/pages/RezerwacjaPage.tsx",
+      "endpointy": ["POST /api/reservations", "GET /api/reservations", "GET /api/equipment/available"]
+    },
+    {
+      "id": "P3",
+      "nazwa": "wydanie",
+      "slug": "wydanie",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p3--wydanie",
+      "legacy": [
+        {"opis": "Wypozyczenie.btnWydaj_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Wypozyczenie.aspx.vb:169-217"},
+        {"opis": "RentalManager.WydajSprzet", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/RentalManager.vb:20-93"}
+      ],
+      "wzorce_nazw": ["Wydan", "Issue", "Wypozyczenie"],
+      "sygnaly": ["/backend/src/Wypozyczalnia\\.Api/Controllers/(Issue|Wydan)\\w*Controller\\.cs$"],
+      "strona": "new-app-parent/new-app/frontend/src/pages/WydaniePage.tsx",
+      "endpointy": [],
+      "uwaga": "RentalManager obsługuje wydanie i zwrot; klasy Rental* są dziś przypisane do P4 i mogą stać się wspólne z P3."
+    },
+    {
+      "id": "P4",
+      "nazwa": "zwrot (opłata, kara, kaucja, szkody)",
+      "slug": "zwrot",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p4--zwrot-opłata-kara-kaucja-szkody",
+      "legacy": [
+        {"opis": "Zwrot.btnPodglad_Click / btnZwrot_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Zwrot.aspx.vb:154-244"},
+        {"opis": "RentalManager.ZarejestrujZwrot / ObliczKare", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/RentalManager.vb:95-143"}
+      ],
+      "wzorce_nazw": ["Rental", "Zwrot", "Return", "Penalt", "Kara", "Kaucj", "Deposit", "Damage", "Szkod"],
+      "sygnaly": ["/backend/src/Wypozyczalnia\\.Api/Controllers/RentalController\\.cs$"],
+      "strona": "new-app-parent/new-app/frontend/src/pages/ZwrotPage.tsx",
+      "endpointy": ["GET /api/rentals", "POST /api/rentals/{id}/return"],
+      "uwaga": "Klasy Rental* mogą w przyszłości być wspólne z P3 (wydanie)."
+    },
+    {
+      "id": "P5",
+      "nazwa": "faktura i płatność",
+      "slug": "faktura",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p5--faktura-i-płatność",
+      "legacy": [
+        {"opis": "Faktura.btnWystaw_Click / btnZaplac_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Faktura.aspx.vb:189-253"},
+        {"opis": "InvoiceManager.WystawFaktureZaWypozyczenie / OznaczOplacona", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/InvoiceManager.vb:19-114"}
+      ],
+      "wzorce_nazw": ["Invoice", "Faktur", "Payment", "Platn"],
+      "sygnaly": ["/backend/src/Wypozyczalnia\\.Api/Controllers/(Invoice|Faktur|Payment)\\w*Controller\\.cs$"],
+      "strona": "new-app-parent/new-app/frontend/src/pages/FakturaPage.tsx",
+      "endpointy": []
+    },
+    {
+      "id": "P6",
+      "nazwa": "eksport nocny z importem cennika",
+      "slug": "eksport-nocny",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p6--eksport-nocny-z-importem-cennika",
+      "legacy": [
+        {"opis": "harmonogram CalendarTrigger 02:30", "dowod": "legacy-app-parent/legacy-app/Jobs/EksportNocny/zadanie-harmonogramu.xml:10-16"},
+        {"opis": "Program.Main", "dowod": "legacy-app-parent/legacy-app/Jobs/EksportNocny/Program.vb:21-54"},
+        {"opis": "ImportCennikaXml.ImportujPlik", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/Integracje/ImportCennikaXml.vb:43-95"},
+        {"opis": "EksportCsv.EksportujDzien", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/Integracje/EksportCsv.vb:28-65"}
+      ],
+      "wzorce_nazw": ["Export", "Eksport", "Import", "Nocn"],
+      "sygnaly": ["/backend/src/.*(Export|Eksport|Import)\\w*\\.cs$"],
+      "strona": null,
+      "endpointy": []
+    },
+    {
+      "id": "P7",
+      "nazwa": "klienci",
+      "slug": "klienci",
+      "sekcja08": "legacy-app-parent/analysis/results/08-PRZEPLYWY-BIZNESOWE.md#p7--klienci",
+      "legacy": [
+        {"opis": "Klienci.btnSzukaj_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Klienci.aspx.vb:48-63"},
+        {"opis": "Klienci.btnZapisz_Click / btnZablokuj_Click", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaWeb/Klienci.aspx.vb:95-156"},
+        {"opis": "CustomerManager.Zapisz / CzyMozeWypozyczac / ProgRabatu", "dowod": "legacy-app-parent/legacy-app/WypozyczalniaCore/CustomerManager.vb:26-98"}
+      ],
+      "wzorce_nazw": ["^Customer(Controller|Service)", "Klien", "^customers\\."],
+      "sygnaly": ["/backend/src/Wypozyczalnia\\.Api/Controllers/(Customer|Klien)\\w*Controller\\.cs$"],
+      "strona": "new-app-parent/new-app/frontend/src/pages/KlienciPage.tsx",
+      "endpointy": []
+    }
+  ]
+}
