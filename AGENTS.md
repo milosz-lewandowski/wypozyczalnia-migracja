@@ -27,3 +27,4 @@ Dane w repozytorium są w 100% syntetyczne.
 
 - kodu legacy nie zmieniamy
 - dokumenty i komunikaty piszemy po polsku
+- przenosisz proces z legacy albo bramka jest czerwona → skill `migracja-procesu` (`.github/skills/migracja-procesu/SKILL.md`)
