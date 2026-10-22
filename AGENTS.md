@@ -6,7 +6,8 @@ Dane w repozytorium są w 100% syntetyczne.
 ## Gdzie co jest
 
 - `legacy-app-parent/legacy-app/` - aplikacja legacy (VB.NET WebForms + T-SQL); jedyne źródło procesów biznesowych; tylko do odczytu, nie kompilujemy jej
-- `legacy-app-parent/analysis/` - wyniki rozpoznania aplikacji legacy
+- Stary system: [instrukcje legacy](legacy-app-parent/AGENTS.md) (start pracy z legacy) i [wyniki analizy](legacy-app-parent/analysis/results/)
+- `legacy-app-parent/analysis/` - rozpoznanie aplikacji legacy: `results/` wyniki sprawdzone, `temp/` hipotezy i robocze wnioski
 - `new-app-parent/new-app/` - nowa aplikacja: `backend/` (C#, ASP.NET Core, .NET 10; `Wypozyczalnia.sln`), `frontend/` (React, TypeScript)
 - `new-app-parent/new-docs/` - jak uruchomić, bramka jakości, zgłoszenie błędu, definicja ukończenia
 - `tools/` - narzędzia zespołu (pomiar kodu, sprawdzanie dowodów, bramka jakości, skrypty uruchamiania)

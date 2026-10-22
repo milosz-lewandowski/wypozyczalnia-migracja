@@ -1,0 +1,148 @@
+{
+  "katalog": "../legacy-app-parent/legacy-app",
+  "wzorce": [
+    {
+      "nazwa": "WebForms — markup strony",
+      "opis": "Plik ASPX z deklaracją interfejsu WebForms.",
+      "pliki": ["WypozyczalniaWeb/*.aspx"]
+    },
+    {
+      "nazwa": "WebForms — code-behind",
+      "opis": "Kod strony powiązany z markupem ASPX.",
+      "pliki": ["WypozyczalniaWeb/*.aspx.vb"]
+    },
+    {
+      "nazwa": "WebForms — designer",
+      "opis": "Deklaracje wygenerowane dla kontrolek strony.",
+      "pliki": ["WypozyczalniaWeb/*.designer.vb"]
+    },
+    {
+      "nazwa": "Cykl życia aplikacji Web",
+      "opis": "Global.asax i jego kod VB.",
+      "pliki": ["WypozyczalniaWeb/Global.asax", "WypozyczalniaWeb/Global.asax.vb"]
+    },
+    {
+      "nazwa": "Proxy SOAP",
+      "opis": "Klient wygenerowany z WSDL bramki płatności.",
+      "pliki": ["WypozyczalniaWeb/Web References/BramkaPlatnosci/Reference.vb"]
+    },
+    {
+      "nazwa": "Kontrakty integracji SOAP",
+      "opis": "Kontrakt WSDL bramki płatności.",
+      "pliki": ["WypozyczalniaWeb/Web References/BramkaPlatnosci/*.wsdl"]
+    },
+    {
+      "nazwa": "Manager aplikacyjny",
+      "opis": "Klasy managerów w Core.",
+      "pliki": ["WypozyczalniaCore/*Manager.vb"]
+    },
+    {
+      "nazwa": "Table Data Gateway / DAL",
+      "opis": "Pliki warstwy dostępu do danych.",
+      "pliki": ["WypozyczalniaCore/DAL/*.vb"]
+    },
+    {
+      "nazwa": "Model domenowy",
+      "opis": "Typy przechowywane w katalogu Model.",
+      "pliki": ["WypozyczalniaCore/Model/*.vb"]
+    },
+    {
+      "nazwa": "Adapter integracyjny",
+      "opis": "Klient kuriera oraz import/eksport plików.",
+      "pliki": ["WypozyczalniaCore/Integracje/*.vb"]
+    },
+    {
+      "nazwa": "Zadanie wsadowe",
+      "opis": "Punkt wejścia procesu EksportNocny.",
+      "pliki": ["Jobs/EksportNocny/Program.vb"]
+    },
+    {
+      "nazwa": "Projekt .NET",
+      "opis": "Manifest projektu MSBuild.",
+      "pliki": ["**/*.vbproj"]
+    },
+    {
+      "nazwa": "Solucja Visual Studio",
+      "opis": "Manifest solucji.",
+      "pliki": ["*.sln"]
+    },
+    {
+      "nazwa": "Konfiguracja aplikacji",
+      "opis": "Konfiguracja Web oraz manifest pakietów.",
+      "pliki": ["WypozyczalniaWeb/*.config"]
+    },
+    {
+      "nazwa": "Skrypt bazy danych",
+      "opis": "Schemat, procedury i dane seed.",
+      "pliki": ["Database/*.sql"]
+    },
+    {
+      "nazwa": "Harmonogram zadania",
+      "opis": "Definicja Windows Task Scheduler.",
+      "pliki": ["Jobs/EksportNocny/*.xml"]
+    },
+    {
+      "nazwa": "Notatka wdrożeniowa",
+      "opis": "Opis systemu i notatka zespołu IT.",
+      "pliki": ["CZYTAJ.txt"]
+    }
+  ],
+  "konstrukcje": [
+    {
+      "nazwa": "Literały SQL w kodzie VB",
+      "opis": "Polecenia SQL osadzone w literałach poza katalogiem DAL.",
+      "regex": "\"\\s*(SELECT\\b|INSERT\\s+INTO\\b|UPDATE\\s+\\w+\\s+SET\\b|DELETE\\s+FROM\\b|MERGE\\b|EXEC(?:UTE)?\\b)",
+      "pliki": ["**/*.vb"],
+      "dozwolone": ["WypozyczalniaCore/DAL/**"],
+      "ignoruj_wielkosc": true
+    },
+    {
+      "nazwa": "Bezpośredni dostęp do DbHelper poza DAL",
+      "opis": "Wywołania helpera danych dozwolone w DAL; pozostali konsumenci wskazują na przekroczenie warstwy.",
+      "regex": "\\bDbHelper\\s*\\.",
+      "pliki": ["**/*.vb"],
+      "dozwolone": ["WypozyczalniaCore/DAL/**"],
+      "ignoruj_wielkosc": true
+    },
+    {
+      "nazwa": "Zaokrąglenie kwoty poza managerem",
+      "opis": "Math.Round dla kwot dozwolone tylko w managerach Core.",
+      "regex": "\\bMath\\s*\\.\\s*Round\\s*\\(",
+      "pliki": ["**/*.vb"],
+      "dozwolone": ["WypozyczalniaCore/*Manager.vb"],
+      "ignoruj_wielkosc": true
+    },
+    {
+      "nazwa": "Stała procentowa poza managerem",
+      "opis": "Stałe kwotowe/procentowe w przypisaniu dozwolone tylko w managerach Core.",
+      "regex": "\\b\\w*(?:Vat|Rabat|Proc|Procent|Kara|Spozn|Stawka|Mnoznik)\\w*\\s*(?:As\\s+\\w+\\s*)?=\\s*[\"']?\\d+[,.]\\d+",
+      "pliki": ["**/*.vb"],
+      "dozwolone": ["WypozyczalniaCore/*Manager.vb"],
+      "ignoruj_wielkosc": true
+    },
+    {
+      "nazwa": "Współczynnik rabatu zaszyty w formule",
+      "opis": "Współczynnik progowego rabatu powinien być utrzymywany w managerze cenowym.",
+      "regex": "\\b(?:prog|rabat\\w*)\\s*\\*\\s*\\d+(?:[,.]\\d+)?D?\\b",
+      "pliki": ["**/*.vb"],
+      "dozwolone": ["WypozyczalniaCore/*Manager.vb"],
+      "ignoruj_wielkosc": true
+    },
+    {
+      "nazwa": "Domyślna stawka VAT zaszyta w kodzie",
+      "opis": "Literalny fallback stawki VAT jest kopią konfiguracji i wymaga jawnej decyzji migracyjnej.",
+      "regex": "\\bPrivate\\s+Const\\s+DomyslnaStawkaVat\\s+As\\s+String\\s*=",
+      "pliki": ["**/*.vb"],
+      "dozwolone": [],
+      "ignoruj_wielkosc": true
+    },
+    {
+      "nazwa": "Bezpośredni dostęp do Session poza Web",
+      "opis": "Stan sesji jest szczegółem warstwy Web.",
+      "regex": "\\bSession(?:\\.Item)?\\s*\\(",
+      "pliki": ["**/*.vb"],
+      "dozwolone": ["WypozyczalniaWeb/**/*.vb"],
+      "ignoruj_wielkosc": true
+    }
+  ]
+}
