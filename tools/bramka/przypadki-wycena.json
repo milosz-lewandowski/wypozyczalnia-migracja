@@ -1,0 +1,141 @@
+{
+  "proces": "wycena",
+  "opis": "Przypadki akceptacyjne wyceny wynajmu (GET /api/pricing/quote). Wartości oczekiwane policzone z kodu legacy na danych z data.sql (dane syntetyczne). Kwoty jako tekst dziesiętny, porównywane liczbowo.",
+  "kontrakt": "new-app-parent/new-docs/KONTRAKT-API.md",
+  "wykrycie": ["Pricing", "Wycen", "Quote", "Tarif", "Cennik"],
+  "sonda": {
+    "opis": "GET /api/pricing/quote",
+    "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote"}
+  },
+  "przypadki": [
+    {
+      "id": "wycena-01",
+      "wejscie": "sprzęt 6, pn 12.10 08:00 -> sb 17.10 08:00, klient 2",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "6", "from": "2026-10-12T08:00", "to": "2026-10-17T08:00", "customerId": "2"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "141.36", "days": 5, "weekendDays": 0,
+                     "customerDiscountPercent": 2, "weeklyDiscountPercent": "0", "dailyRate": "28.85"}}
+    },
+    {
+      "id": "wycena-02",
+      "wejscie": "sprzęt 2, wt 13.10 09:00 -> czw 15.10 09:30, klient 1",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-13T09:00", "to": "2026-10-15T09:30", "customerId": "1"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "144.70", "days": 2, "weekendDays": 0, "customerDiscountPercent": 0}}
+    },
+    {
+      "id": "wycena-03",
+      "wejscie": "sprzęt 2, wt 13.10 09:00 -> czw 15.10 10:00, klient 1",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-13T09:00", "to": "2026-10-15T10:00", "customerId": "1"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "144.70", "days": 2, "weekendDays": 0, "customerDiscountPercent": 0}}
+    },
+    {
+      "id": "wycena-04",
+      "wejscie": "sprzęt 2, wt 13.10 09:00 -> czw 15.10 10:01, klient 1",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-13T09:00", "to": "2026-10-15T10:01", "customerId": "1"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "217.05", "days": 3, "weekendDays": 0, "customerDiscountPercent": 0}}
+    },
+    {
+      "id": "wycena-05",
+      "wejscie": "sprzęt 2, pt 09.10 10:00 -> pt 16.10 10:00, klient 1",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-09T10:00", "to": "2026-10-16T10:00", "customerId": "1"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "488.37", "days": 7, "weekendDays": 2, "customerDiscountPercent": 0,
+                     "weekendRate": "90.44", "weeklyDiscountPercent": "10"}}
+    },
+    {
+      "id": "wycena-06",
+      "wejscie": "sprzęt 2, wt 13.10 09:00 -> czw 15.10 09:00, klient 4",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-13T09:00", "to": "2026-10-15T09:00", "customerId": "4"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "133.12", "days": 2, "weekendDays": 0, "customerDiscountPercent": 8}}
+    },
+    {
+      "id": "wycena-07",
+      "wejscie": "sprzęt 4, czw 01.10 08:00 -> czw 15.10 08:00, klient 10",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "4", "from": "2026-10-01T08:00", "to": "2026-10-15T08:00", "customerId": "10"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "478.15", "days": 14, "weekendDays": 4, "customerDiscountPercent": 8,
+                     "weekendRate": "48.12"}}
+    },
+    {
+      "id": "wycena-08",
+      "wejscie": "sprzęt 15, wt 20.10 08:00 -> 08:30, bez klienta",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "15", "from": "2026-10-20T08:00", "to": "2026-10-20T08:30"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "12.50", "days": 1, "weekendDays": 0, "customerDiscountPercent": 0}}
+    },
+    {
+      "id": "wycena-09",
+      "wejscie": "sprzęt 6, pn 12.10 08:00 -> sb 17.10 08:00, klient 999 (brak w bazie)",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "6", "from": "2026-10-12T08:00", "to": "2026-10-17T08:00", "customerId": "999"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "144.25", "days": 5, "weekendDays": 0, "customerDiscountPercent": 0}}
+    },
+    {
+      "id": "wycena-10",
+      "wejscie": "sprzęt 2, data zwrotu = data wydania (13.10 09:00), klient 1",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-13T09:00", "to": "2026-10-13T09:00", "customerId": "1"}},
+      "oczekiwane": {"status": 400, "pola": {"error": "Data zwrotu musi byc pozniejsza niz data wydania"}}
+    },
+    {
+      "id": "wycena-11",
+      "wejscie": "sprzęt 999 (brak w bazie), 13.10 09:00 -> 15.10 09:00",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "999", "from": "2026-10-13T09:00", "to": "2026-10-15T09:00"}},
+      "oczekiwane": {"status": 404, "pola": {"error": "Nieznany sprzet: 999"}}
+    },
+    {
+      "id": "wycena-12",
+      "wejscie": "sprzęt 6, wydanie 02.06.2025 08:00 -> 03.06.2025 08:00, bez klienta",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "6", "from": "2025-06-02T08:00", "to": "2025-06-03T08:00"}},
+      "oczekiwane": {"status": 409, "pola": {"error": "Brak taryfy dla kategorii OGR na dzien 2025-06-02"}}
+    },
+    {
+      "id": "wycena-13",
+      "wejscie": "sprzęt 15, wt 20.10 08:00 -> 08:01, bez klienta",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "15", "from": "2026-10-20T08:00", "to": "2026-10-20T08:01"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "12.50", "days": 1}}
+    },
+    {
+      "id": "wycena-14",
+      "wejscie": "sprzęt 15, wt 20.10 08:00 -> śr 21.10 09:00, bez klienta",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "15", "from": "2026-10-20T08:00", "to": "2026-10-21T09:00"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "12.50", "days": 1}}
+    },
+    {
+      "id": "wycena-15",
+      "wejscie": "sprzęt 15, wt 20.10 08:00 -> śr 21.10 09:01, bez klienta",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "15", "from": "2026-10-20T08:00", "to": "2026-10-21T09:01"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "25.00", "days": 2, "weekendDays": 0}}
+    },
+    {
+      "id": "wycena-16",
+      "wejscie": "sprzęt 2, wt 13.10 09:00 -> czw 15.10 09:00, klient 3",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "2", "from": "2026-10-13T09:00", "to": "2026-10-15T09:00", "customerId": "3"}},
+      "oczekiwane": {"status": 200, "pola": {"amount": "137.46", "days": 2, "customerDiscountPercent": 5}}
+    },
+    {
+      "id": "wycena-17",
+      "wejscie": "brak parametru to",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "6", "from": "2026-10-12T08:00"}},
+      "oczekiwane": {"status": 400, "pola_obecne": ["error"]}
+    },
+    {
+      "id": "wycena-18",
+      "wejscie": "data from w formacie 12.10.2026 08:00",
+      "zapytanie": {"metoda": "GET", "sciezka": "/api/pricing/quote",
+                    "parametry": {"equipmentId": "6", "from": "12.10.2026 08:00", "to": "2026-10-17T08:00"}},
+      "oczekiwane": {"status": 400, "pola_obecne": ["error"]}
+    }
+  ]
+}

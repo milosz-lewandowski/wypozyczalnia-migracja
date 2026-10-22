@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Wypozyczalnia</RootNamespace>
+    <AssemblyName>Wypozyczalnia.Api</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- ADO.NET dla SQLite (Microsoft); bez EF i bez Dappera - SQL piszemy recznie w Repositories/. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Skrypty bazy ladowane przy starcie z katalogu aplikacji (AppContext.BaseDirectory/Database). -->
+    <Content Include="Database\*.sql" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,41 @@
+WYPOZYCZALNIA SPRZETU - system obslugi punktu
+=============================================
+Notatka zespolu IT, wersja z 2014-04 (aktualizacja MW 2015-09)
+
+1. Co to jest
+-------------
+Aplikacja WebForms do obslugi punktu wypozyczen: klienci, katalog sprzetu,
+rezerwacje, wydania, zwroty, faktury. Baza danych: SQL Server 2008.
+Platnosci online obsluguje strona Platnosc.aspx (bramka SOAP).
+Rabaty dla stalych klientow liczone sa w Cennik.aspx.
+
+2. Struktura
+------------
+- Wypozyczalnia.sln        - solucja (Web + Core)
+- WypozyczalniaWeb         - strony .aspx, code-behind
+- WypozyczalniaCore        - logika (managery), DAL, integracje
+- Database                 - skrypty SQL (schemat, procedury, dane testowe)
+- Jobs\EksportNocny        - zadanie nocne (budowane osobno, NIE ma go w solucji)
+
+3. Wdrozenie na IIS 7
+---------------------
+a) Zbudowac solucje w konfiguracji Release (VS 2010 lub nowszy).
+b) Na serwerze utworzyc pule aplikacji .NET 4.0, tryb Integrated.
+c) Skopiowac zawartosc WypozyczalniaWeb (bez obj) do D:\inetpub\wypozyczalnia.
+d) W IIS Manager dodac aplikacje pod Default Web Site, wskazac pule.
+e) Uprawnienia: konto puli musi miec zapis do D:\Logi oraz odczyt
+   z D:\Wypozyczalnia\import\cennik.
+f) Connection string w Web.config - sprawdzic nazwe serwera SQL.
+g) Uruchomic skrypty z katalogu Database w kolejnosci 01, 02, 03
+   (03 tylko na srodowisku testowym).
+
+4. Zadanie nocne
+----------------
+EksportNocny.exe uruchamiany z Harmonogramu zadan o 02:30.
+Przed budowa zadania najpierw zbudowac WypozyczalniaCore w Release,
+bo projekt bierze DLL z katalogu bin\Release.
+
+5. Kontakt
+----------
+Problemy zglaszac do zespolu IT (JK, MW). Dokumentacja bramki platnosci
+w segregatorze "Integracje" w pokoju 12.

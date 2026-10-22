@@ -1,0 +1,22 @@
+# build
+build/
+dist/
+out/
+bin/
+obj/
+
+# node
+node_modules/
+
+# IDE (.vscode/ jest śledzony celowo)
+.idea/
+*.iml
+*.log
+*.tsbuildinfo
+
+# Python
+__pycache__/
+
+# Playwright
+test-results/
+playwright-report/

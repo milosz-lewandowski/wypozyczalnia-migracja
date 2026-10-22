@@ -1,0 +1,4 @@
+# Instrukcje dla Copilota
+
+- To repozytorium szkoleniowe: przenosimy procesy biznesowe z `legacy-app-parent/legacy-app/` do `new-app-parent/new-app/`.
+- Odpowiadaj i pisz dokumenty po polsku.

@@ -1,0 +1,390 @@
+{
+  "proces": "zwrot",
+  "opis": "Przypadki akceptacyjne zwrotu z karą, kaucją i szkodami (POST /api/rentals/{id}/return). Wartości oczekiwane policzone z kodu legacy na danych z data.sql i dane-zwrot.sql (dane syntetyczne). Każdy przypadek zamyka inne otwarte wypożyczenie, więc kolejność ma znaczenie: przypadki błędów na wypożyczeniu 6 idą przed jego zwrotem.",
+  "kontrakt": "new-app-parent/new-docs/KONTRAKT-API.md",
+  "wykrycie": [
+    "Return",
+    "Zwrot",
+    "Kara",
+    "Penalt",
+    "Rental",
+    "Kaucj",
+    "Deposit",
+    "Damage",
+    "Szkod"
+  ],
+  "dane_sql": "dane-zwrot.sql",
+  "sonda": {
+    "opis": "POST /api/rentals/{id}/return",
+    "zapytanie": {
+      "metoda": "POST",
+      "sciezka": "/api/rentals/6/return",
+      "tresc_surowa": "{"
+    }
+  },
+  "przypadki": [
+    {
+      "id": "zwrot-01",
+      "wejscie": "wypożyczenie 6, brak pola returnedAt",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/6/return",
+        "tresc": {
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 400,
+        "pola_obecne": [
+          "error"
+        ]
+      }
+    },
+    {
+      "id": "zwrot-02",
+      "wejscie": "wypożyczenie 6, returnedAt w formacie 19.10.2026 12:00",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/6/return",
+        "tresc": {
+          "returnedAt": "19.10.2026 12:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 400,
+        "pola_obecne": [
+          "error"
+        ]
+      }
+    },
+    {
+      "id": "zwrot-03",
+      "wejscie": "wypożyczenie 999 (brak w bazie)",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/999/return",
+        "tresc": {
+          "returnedAt": "2026-10-19T12:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 404,
+        "pola": {
+          "error": "Nie znaleziono wypozyczenia 999"
+        }
+      }
+    },
+    {
+      "id": "zwrot-04",
+      "wejscie": "wypożyczenie 1 (zamknięte w danych startowych)",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/1/return",
+        "tresc": {
+          "returnedAt": "2026-10-19T12:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 409,
+        "pola": {
+          "error": "Wypozyczenie 1 jest juz zamkniete"
+        }
+      }
+    },
+    {
+      "id": "zwrot-05",
+      "wejscie": "wypożyczenie 6 (sprzęt 7, plan nd 18.10 10:00), zwrot pn 19.10 12:00, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/6/return",
+        "tresc": {
+          "returnedAt": "2026-10-19T12:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "rentalId": 6,
+          "fee": "142.80",
+          "lateMinutes": 1560,
+          "lateDays": 2,
+          "penalty": "357.00",
+          "damagesTotal": "0.00",
+          "depositReturned": "443.00",
+          "status": "CLOSED",
+          "depositTaken": "800.00"
+        }
+      }
+    },
+    {
+      "id": "zwrot-06",
+      "wejscie": "wypożyczenie 5 (sprzęt 12, plan pn 19.10 09:00), zwrot 19.10 09:45, szkoda CASING",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/5/return",
+        "tresc": {
+          "returnedAt": "2026-10-19T09:45",
+          "damages": [
+            "CASING"
+          ]
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "rentalId": 5,
+          "fee": "228.96",
+          "lateMinutes": 45,
+          "lateDays": 0,
+          "penalty": "0.00",
+          "damagesTotal": "50.00",
+          "depositReturned": "150.00",
+          "status": "CLOSED",
+          "depositTaken": "200.00"
+        }
+      }
+    },
+    {
+      "id": "zwrot-07",
+      "wejscie": "wypożyczenie 4 (sprzęt 4, plan czw 15.10 08:00), zwrot 22.10 08:00, szkoda DIRT",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/4/return",
+        "tresc": {
+          "returnedAt": "2026-10-22T08:00",
+          "damages": [
+            "DIRT"
+          ]
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "rentalId": 4,
+          "fee": "478.15",
+          "lateMinutes": 10080,
+          "lateDays": 7,
+          "penalty": "404.25",
+          "damagesTotal": "20.00",
+          "depositReturned": "0.00",
+          "status": "CLOSED",
+          "depositTaken": "400.00"
+        }
+      }
+    },
+    {
+      "id": "zwrot-08",
+      "wejscie": "wypożyczenie 901 (sprzęt 2, kaucja 500,00, plan wt 20.10 10:00), zwrot 20.10 11:00, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/901/return",
+        "tresc": {
+          "returnedAt": "2026-10-20T11:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 60,
+          "lateDays": 0,
+          "penalty": "0.00",
+          "damagesTotal": "0.00",
+          "depositReturned": "500.00",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-09",
+      "wejscie": "wypożyczenie 902 (sprzęt 3, kaucja 600,00, plan wt 20.10 10:00), zwrot 20.10 11:01, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/902/return",
+        "tresc": {
+          "returnedAt": "2026-10-20T11:01",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 61,
+          "lateDays": 1,
+          "penalty": "134.85",
+          "damagesTotal": "0.00",
+          "depositReturned": "465.15",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-10",
+      "wejscie": "wypożyczenie 903 (sprzęt 7, kaucja 800,00, plan wt 20.10 10:00), zwrot 21.10 11:00, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/903/return",
+        "tresc": {
+          "returnedAt": "2026-10-21T11:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 1500,
+          "lateDays": 1,
+          "penalty": "178.50",
+          "damagesTotal": "0.00",
+          "depositReturned": "621.50",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-11",
+      "wejscie": "wypożyczenie 904 (sprzęt 7, kaucja 800,00, plan wt 20.10 10:00), zwrot 21.10 11:01, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/904/return",
+        "tresc": {
+          "returnedAt": "2026-10-21T11:01",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 1501,
+          "lateDays": 2,
+          "penalty": "357.00",
+          "damagesTotal": "0.00",
+          "depositReturned": "443.00",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-12",
+      "wejscie": "wypożyczenie 905 (sprzęt 2, kaucja 500,00, plan wt 20.10 10:00), zwrot 21.10 12:00, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/905/return",
+        "tresc": {
+          "returnedAt": "2026-10-21T12:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 1560,
+          "lateDays": 2,
+          "penalty": "217.05",
+          "damagesTotal": "0.00",
+          "depositReturned": "282.95",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-13",
+      "wejscie": "wypożyczenie 906 (sprzęt 7, kaucja 800,00, plan wt 20.10 10:00), zwrot 20.10 10:00, bez pola damages",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/906/return",
+        "tresc": {
+          "returnedAt": "2026-10-20T10:00"
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 0,
+          "lateDays": 0,
+          "penalty": "0.00",
+          "damagesTotal": "0.00",
+          "depositReturned": "800.00",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-14",
+      "wejscie": "wypożyczenie 907 (sprzęt 7, kaucja 800,00, plan wt 20.10 10:00), zwrot 21.10 10:00, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/907/return",
+        "tresc": {
+          "returnedAt": "2026-10-21T10:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 1440,
+          "lateDays": 1,
+          "penalty": "178.50",
+          "damagesTotal": "0.00",
+          "depositReturned": "621.50",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-15",
+      "wejscie": "wypożyczenie 908 (sprzęt 2, kaucja 500,00, plan wt 20.10 10:00), zwrot 21.10 10:00, bez szkód",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/908/return",
+        "tresc": {
+          "returnedAt": "2026-10-21T10:00",
+          "damages": []
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 1440,
+          "lateDays": 1,
+          "penalty": "108.52",
+          "damagesTotal": "0.00",
+          "depositReturned": "391.48",
+          "status": "CLOSED"
+        }
+      }
+    },
+    {
+      "id": "zwrot-16",
+      "wejscie": "wypożyczenie 909 (sprzęt 15, kaucja 300,00, plan wt 20.10 10:00), zwrot 20.10 10:00, szkody CASING, ACCESSORIES, DIRT",
+      "zapytanie": {
+        "metoda": "POST",
+        "sciezka": "/api/rentals/909/return",
+        "tresc": {
+          "returnedAt": "2026-10-20T10:00",
+          "damages": [
+            "CASING",
+            "ACCESSORIES",
+            "DIRT"
+          ]
+        }
+      },
+      "oczekiwane": {
+        "status": 200,
+        "pola": {
+          "lateMinutes": 0,
+          "lateDays": 0,
+          "penalty": "0.00",
+          "damagesTotal": "100.00",
+          "depositReturned": "200.00",
+          "status": "CLOSED"
+        }
+      }
+    }
+  ]
+}
