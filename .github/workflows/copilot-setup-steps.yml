@@ -1,0 +1,52 @@
+# Środowisko Copilot cloud agenta (job musi nazywać się copilot-setup-steps).
+# UWAGA: GitHub uruchamia ten plik dla agenta dopiero, gdy jest na gałęzi domyślnej (main).
+# Dokumentacja: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/customize-the-agent-environment
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: .NET 10 (backend Wypozyczalnia.sln, net10.0)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Python 3 (bramka jakości, sprawdz_dowody, migration-supervisor)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Node.js (frontend React + Vite)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: new-app-parent/new-app/frontend/package-lock.json
+
+      - name: Zależności frontendu (npm ci; potrzebne do typów w bramce)
+        working-directory: new-app-parent/new-app/frontend
+        run: npm ci
+
+      - name: Zależności backendu
+        run: dotnet restore new-app-parent/new-app/backend/Wypozyczalnia.sln
+
+      - name: Hook pre-commit migration-supervisor (core.hooksPath=.githooks)
+        run: |
+          chmod +x .githooks/*
+          git config core.hooksPath .githooks
