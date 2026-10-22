@@ -1,0 +1,91 @@
+name: CI
+
+# Build backendu (.NET 10) i frontendu (React + Vite + TS) na kazdym PR, potem bramka jakosci z tools/
+# (ta sama komenda co lokalnie). Job "bramka" = wymagany status check w regule ochrony galezi main.
+# Bramka = warunek dalszego kroku (CD): zielona bramka na main = artefakt gotowy do wydania.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Restore backend
+        working-directory: new-app-parent/new-app/backend
+        run: dotnet restore Wypozyczalnia.sln
+      - name: Build backend
+        working-directory: new-app-parent/new-app/backend
+        run: dotnet build Wypozyczalnia.sln --no-restore -c Release
+      - name: Test backend
+        working-directory: new-app-parent/new-app/backend
+        run: dotnet test Wypozyczalnia.sln --no-build -c Release
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Install frontend dependencies
+        working-directory: new-app-parent/new-app/frontend
+        run: npm ci
+      - name: Build frontend
+        working-directory: new-app-parent/new-app/frontend
+        run: npm run build
+
+  bramka:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      # krok 2 bramki (typy frontendu) wymaga node_modules; bez nich bramka go pomija
+      - name: Install frontend dependencies
+        working-directory: new-app-parent/new-app/frontend
+        run: npm ci
+      # pwsh (PowerShell 7) jest preinstalowany na ubuntu-latest; skrypt sam wybiera npx/npx.cmd i python/python3
+      - name: 'Bramka jakosci (BRAMKA: OK albo lista "nie")'
+        run: pwsh tools/bramka.ps1
+
+  # Szkic CD (do decyzji trenera): po zielonej bramce na main publikujemy artefakt backendu.
+  # Bez srodowiska docelowego; "wydanie" = paczka dotnet publish do pobrania z przebiegu.
+  wydanie:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [bramka]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Publish backend
+        working-directory: new-app-parent/new-app/backend
+        run: dotnet publish src/Wypozyczalnia.Api/Wypozyczalnia.Api.csproj -c Release -o ${{ runner.temp }}/backend-publish
+      - uses: actions/upload-artifact@v7
+        with:
+          name: backend-publish
+          path: ${{ runner.temp }}/backend-publish
+          retention-days: 7

@@ -1,0 +1,44 @@
+name: Copilot Setup Steps
+
+# Srodowisko agenta w chmurze (Copilot cloud agent). Plik musi lezec na galezi domyslnej,
+# a job musi sie nazywac dokladnie copilot-setup-steps (inaczej Copilot go nie podejmie).
+# Copilot honoruje w jobie tylko: steps, permissions, runs-on, services, snapshot, timeout-minutes (max 59).
+# Agent dostaje .NET 10, Node 24 i Python 3 oraz pobrane zaleznosci (NuGet, node_modules),
+# zeby mogl uruchomic testy i bramke: pwsh tools/bramka.ps1 (pwsh jest na ubuntu-latest).
+# Krok z bledem nie zatrzymuje agenta: Copilot pomija reszte krokow i startuje z biezacym stanem.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      # pakiety NuGet pobrane przed startem agenta (zrodlo: backend/nuget.config, tylko nuget.org)
+      - name: Restore backend
+        working-directory: new-app-parent/new-app/backend
+        run: dotnet restore Wypozyczalnia.sln
+      - name: Build backend (bez testow)
+        working-directory: new-app-parent/new-app/backend
+        run: dotnet build Wypozyczalnia.sln --no-restore
+      - name: Install frontend dependencies
+        working-directory: new-app-parent/new-app/frontend
+        run: npm ci

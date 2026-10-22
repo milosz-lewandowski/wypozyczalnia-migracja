@@ -15,12 +15,13 @@ Dane w repozytorium są w 100% syntetyczne.
 ## Komendy
 
 - testy backendu: `dotnet test new-app-parent/new-app/backend/Wypozyczalnia.sln`
-- bramka jakości: `.\tools\bramka.ps1`
+- bramka jakości: `.\tools\bramka.ps1` (Windows); na Linuksie (agent w chmurze, CI): `pwsh tools/bramka.ps1`
 - `.\tools\uruchom-backend.ps1` - backend z hot reloadem (`dotnet watch`, port 8080)
 - `.\tools\uruchom-frontend.ps1` - frontend (`npm run dev`, Vite, port 5173)
 - `.\tools\uruchom-wszystko.ps1` - backend i frontend w osobnych kartach terminala
 - `.\tools\restart-backend.ps1` - restart backendu
 - `.\tools\zatrzymaj.ps1` - zatrzymanie, zwalnia porty 8080 i 5173
+- skrypty `uruchom-*`, `restart-backend.ps1` i `zatrzymaj.ps1` są tylko dla Windows
 - szczegóły: `new-app-parent/new-docs/URUCHOMIENIE.md`
 
 ## Zasady

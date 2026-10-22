@@ -1,9 +1,10 @@
+#!/usr/bin/env pwsh
 # Bramka jakosci nowej aplikacji: jedna komenda, lancuch krokow, wynik "BRAMKA: OK" albo lista "nie" z powodami.
 #   1. testy backendu (dotnet test na backend/Wypozyczalnia.sln; tu biegnie tez test architektury)
 #   2. typy frontendu (npx tsc -b), tylko gdy sa node_modules
 #   3. reguly statyczne (tools/bramka/sprawdz.py)
 #   4. przypadki akceptacyjne przez API (tools/bramka/akceptacja.py; proces nieprzeniesiony = pominiety)
-# Uruchomienie z dowolnego katalogu: .\tools\bramka.ps1   (Linux: pwsh tools/bramka.ps1)
+# Uruchomienie z dowolnego katalogu: .\tools\bramka.ps1   (Linux: pwsh tools/bramka.ps1 albo ./tools/bramka.ps1)
 # Kod wyjscia: 0 = OK, 1 = co najmniej jedno "nie". Szczegoly kazdego "nie" wypisuje krok powyzej podsumowania.
 # Plik celowo tylko ASCII (Windows PowerShell 5.1 czyta skrypty bez BOM jako ANSI).
 

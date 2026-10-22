@@ -1,0 +1,38 @@
+name: Zakres PR
+
+# PR nie moze zmieniac plikow, ktore pilnuja jakosci: schematu bazy, workflowow i bramki.
+# Zmiana tych plikow = osobny PR czlowieka z uzasadnieniem.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  chronione-pliki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Reject protected file changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mapfile -t changed < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          violations=()
+          for path in "${changed[@]}"; do
+            if [[ "$path" == "new-app-parent/new-app/backend/src/Wypozyczalnia.Api/Database/schema.sql" \
+               || "$path" == .github/workflows/* \
+               || "$path" == "tools/bramka.ps1" \
+               || "$path" == tools/bramka/* ]]; then
+              violations+=("$path")
+            fi
+          done
+          if ((${#violations[@]})); then
+            echo "::error::Zmieniono chronione pliki:"
+            printf '%s\n' "${violations[@]}"
+            exit 1
+          fi
+          echo "Brak zmian chronionych plikow."

@@ -4,8 +4,8 @@ Czytaj, gdy uruchamiasz bramkę albo bramka jest czerwona.
 
 ## Uruchomienie
 
-- Z korzenia repo: `.\tools\bramka.ps1`; opis: `new-app-parent/new-docs/BRAMKA.md`.
-- Bramka startuje własny backend na porcie 8089; zajęty port → `$env:BRAMKA_PORT='<wolny port>'` przed uruchomieniem.
+- Z korzenia repo: `.\tools\bramka.ps1` (Windows) albo `pwsh tools/bramka.ps1` (Linux, agent w chmurze); opis: `new-app-parent/new-docs/BRAMKA.md`.
+- Bramka startuje własny backend na porcie 8089; zajęty port → `$env:BRAMKA_PORT='<wolny port>'` przed uruchomieniem (Linux: `BRAMKA_PORT=<wolny port> pwsh tools/bramka.ps1`).
 - Cel: ostatnia linia `BRAMKA: OK`.
 
 ## Czytanie wyniku

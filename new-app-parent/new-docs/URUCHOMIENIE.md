@@ -11,7 +11,7 @@ Wymagania: .NET SDK 10, Node.js z npm, Python 3 (narzędzia w `tools/`). Komendy
 | przeładuj backend w karcie backendu | `Ctrl+R` w tej karcie |
 | hot reload frontu | nic - zapis pliku odświeża przeglądarkę |
 | testy backendu | `dotnet test new-app-parent\new-app\backend\Wypozyczalnia.sln` |
-| bramka jakości (testy, typy, reguły, akceptacja) | `.\tools\bramka.ps1` |
+| bramka jakości (testy, typy, reguły, akceptacja) | `.\tools\bramka.ps1` (Linux: `pwsh tools/bramka.ps1`) |
 | zatrzymaj wszystko (porty 8080 i 5173) | `.\tools\zatrzymaj.ps1` |
 | port zajęty przez proces spoza repo | `.\tools\zatrzymaj.ps1 -Wymus` |
 | pierwsze uruchomienie frontu (brak `node_modules`) | `cd new-app-parent\new-app\frontend; npm ci; cd ..\..\..` |

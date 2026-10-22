@@ -1,6 +1,6 @@
 # Bramka jakości
 
-Uruchomienie z katalogu głównego repo: `.\tools\bramka.ps1`
+Uruchomienie z katalogu głównego repo: `.\tools\bramka.ps1` (Linux: `pwsh tools/bramka.ps1`)
 
 Bramka sprawdza:
 - kompilację i testy backendu (`dotnet test` na `backend/Wypozyczalnia.sln`, w tym testy architektury xUnit)

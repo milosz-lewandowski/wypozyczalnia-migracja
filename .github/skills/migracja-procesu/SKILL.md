@@ -12,7 +12,7 @@ Cel: proces w nowej aplikacji daje te same wyniki co legacy; każda reguła ma d
 1. **Rozpoznaj** proces przez router `legacy-app-parent/AGENTS.md`; wypisz reguły z dowodem `plik:linia`, także drugie miejsce liczenia.
 2. **Przypadki** z wartości legacy (progi, zaokrąglenia, stawki) jako testy; czerwone przed kodem.
 3. **Warstwy** wg modułu-wzorca rezerwacji: kontroler → serwis → repozytorium, DTO na granicy, kwoty przez `Money`.
-4. **Bramka**: `.\tools\bramka.ps1` aż do `BRAMKA: OK`.
+4. **Bramka**: `.\tools\bramka.ps1` (Linux: `pwsh tools/bramka.ps1`) aż do `BRAMKA: OK`.
 5. **Czerwona bramka → diff**: najpierw `git diff`, poprawiasz tylko kod tej zmiany.
 6. **Dwuznaczna reguła → stop**: kod kontra komentarz albo dwie formuły = pytanie do człowieka, oczekiwana wartość bez zmian.
 
