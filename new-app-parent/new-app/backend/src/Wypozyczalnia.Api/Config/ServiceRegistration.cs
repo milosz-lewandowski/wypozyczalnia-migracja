@@ -23,10 +23,12 @@ public static class ServiceRegistration
         services.AddSingleton<EquipmentRepository>();
         services.AddSingleton<ReservationRepository>();
         services.AddSingleton<TariffRepository>();
+        services.AddSingleton<RentalRepository>();
 
         services.AddSingleton<AvailabilityService>();
         services.AddSingleton<ReservationService>();
         services.AddSingleton<PricingService>();
+        services.AddSingleton<RentalReturnService>();
 
         services.AddControllers()
             .AddJsonOptions(options =>
